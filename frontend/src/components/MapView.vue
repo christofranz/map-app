@@ -10,9 +10,9 @@
       
 <script>
 import { LMap, LTileLayer, LGeoJson, LControlLayers } from "vue2-leaflet";
+import axios from 'axios';
 // import image from "../assets/dark-map-icon.jpg"
 // import geojsondata from "../assets/route-berlin-muenich.json"
-import geo_nrw from "../assets/motorways_nrw_geo.json"
 
 export default {
   name: "MapView",
@@ -26,10 +26,11 @@ export default {
     return {
       url: "https://api.mapbox.com/styles/v1/mapbox/light-v9/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw",
       zoom: 6,
+      center: [47.5322, 3.9482],
       bounds: null,
       attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, ' +
 			'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-      geonrw: geo_nrw,
+      geonrw: "",
       options: {
         style: function(feature) {
           if (feature.geometry.type == "LineString") {
@@ -57,6 +58,22 @@ export default {
         }
       }
     };
-  }
+  },
+  methods: {
+    getMessage() {
+      const path = 'http://localhost:5000/motorways';
+      axios.get(path)
+        .then((res) => {
+          this.geonrw = res.data.motorways;
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.error(error);
+        });
+    },
+  },
+  mounted() {
+    this.getMessage();
+  },
 };
 </script>
