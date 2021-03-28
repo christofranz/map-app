@@ -5,7 +5,10 @@
   "dependencies": {
     "core-js": "^3.6.5",
     "eslint": "^7.13.0",
-    "vue": "^2.6.11"
+    "axios": "^0.21.1",
+    "leaflet": "1.4.0",
+    "vue": "^2.5.22",
+    "vue2-leaflet": "2.1.1"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
