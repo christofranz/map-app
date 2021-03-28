@@ -1,9 +1,17 @@
 <template>
   <div style="height: 80vh">
-    <LMap :zoom="zoom" :center="center">
+    <form @submit.prevent="handleSubmit">
+      <label>
+        Region:
+        <input type="Region" v-model="region"/>
+      </label>
+      <button type="submit">Submit</button>
+    </form>
+
+    <LMap ref="map" :zoom="zoom" :center="center">
       <LControlLayers ref="control"></LControlLayers>
       <LTileLayer :url="url" :attribution="attribution"></LTileLayer>
-      <LGeoJson :geojson="geonrw" :options="options"></LGeoJson>
+      <LGeoJson ref="geojson" v-if="showGeoNrw" :geojson="geonrw" :options="options"></LGeoJson>
     </LMap>
   </div>
 </template>
@@ -13,6 +21,7 @@ import { LMap, LTileLayer, LGeoJson, LControlLayers } from "vue2-leaflet";
 import axios from 'axios';
 // import image from "../assets/dark-map-icon.jpg"
 // import geojsondata from "../assets/route-berlin-muenich.json"
+const API_URL = 'http://localhost:5000/motorways';
 
 export default {
   name: "MapView",
@@ -31,6 +40,8 @@ export default {
       attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, ' +
 			'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
       geonrw: "",
+      showGeoNrw: false,
+      region: "",
       options: {
         style: function(feature) {
           if (feature.geometry.type == "LineString") {
@@ -60,20 +71,38 @@ export default {
     };
   },
   methods: {
-    getMessage() {
-      const path = 'http://localhost:5000/motorways';
-      axios.get(path)
+    // getMessage() {
+    //   axios.get(path)
+    //     .then((res) => {
+    //       this.geonrw = res.data.motorways;
+    //     })
+    //     .catch((error) => {
+    //       // eslint-disable-next-line
+    //       console.error(error);
+    //     });
+    // },
+    handleSubmit() {
+      // Send data to the server
+
+      axios.get(`${API_URL}/${this.region}/`)
         .then((res) => {
+          // this.getBooks();
           this.geonrw = res.data.motorways;
+          this.map = this.$refs.map;
+          // this.center = [47.5322, 3.9482]
+          // this.$refs.map.mapObject.setView(L.latLng(47.413220, -1.219482), 13);
+          // this.$refs.map.mapObject.fitBounds(this.$refs.geojson.getBounds())
+          this.showGeoNrw = true;
+          console.log("success")
         })
         .catch((error) => {
           // eslint-disable-next-line
-          console.error(error);
+          console.log(error);
         });
     },
   },
   mounted() {
-    this.getMessage();
+    // this.getMessage();
   },
 };
 </script>
