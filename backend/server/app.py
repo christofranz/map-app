@@ -1,7 +1,7 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
-from helpers import query_overpass_api, convert_to_geo_dict
+from backend.server.helpers import query_overpass_api, convert_to_geo_dict
 import os
 
 load_dotenv()

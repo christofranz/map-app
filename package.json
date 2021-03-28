@@ -20,7 +20,7 @@
     "vue-template-compiler": "^2.6.11"
   },
   "scripts": {
-    "start": "gunicorn server.app:app",
+    "start": "gunicorn backend.server.app:app",
     "build": "cd frontend && npm run build"
   },
   "eslintConfig": {
