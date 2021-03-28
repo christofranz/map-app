@@ -21,7 +21,7 @@ import { LMap, LTileLayer, LGeoJson, LControlLayers } from "vue2-leaflet";
 import axios from 'axios';
 // import image from "../assets/dark-map-icon.jpg"
 // import geojsondata from "../assets/route-berlin-muenich.json"
-const API_URL = 'http://localhost:5000/motorways';
+const API_URL = 'https://vue-map-app.herokuapp.com/motorways';
 
 export default {
   name: "MapView",
