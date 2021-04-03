@@ -11,8 +11,12 @@
   "dependencies": {
     "@mapbox/togeojson": "^0.16.0",
     "axios": "^0.21.1",
+    "bootstrap": "^4.6.0",
+    "bootstrap-vue": "^2.21.2",
     "core-js": "^3.6.5",
+    "jquery": "^3.6.0",
     "leaflet": "1.4.0",
+    "popper.js": "^1.16.1",
     "vue": "^2.5.22",
     "vue2-leaflet": "2.1.1"
   },

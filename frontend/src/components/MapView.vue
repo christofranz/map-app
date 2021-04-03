@@ -1,27 +1,35 @@
 <template>
-  <div style="height: 80vh">
-    <form @submit.prevent="handleSubmit">
-      <label>
-        Region:
-        <input type="Region" v-model="region"/>
-      </label>
-      <button type="submit">Submit</button>
-    </form>
+  <!-- <div style="height: 80vh"> -->
+    <div class="container">
+      <div class="row justify-content-center mb-3">
+        <form @submit.prevent="handleSubmit">
+          <div class="form-group">
+            <label for="exampleInputEmail1">Region</label>
+            <input type="Region" v-model="region" class="form-control" id="regionInput" aria-describedby="regionHelp" placeholder="Enter a region">
+            <small id="emailHelp" class="form-text text-muted">Using OpenStreetMap to find all motorways in the specified region.</small>
+          </div>
+          <b-button type="submit" class="btn btn-success btn-sm">Submit</b-button>
+        </form>
+      </div>
+      <div style="height: 80vh">
+        <LMap ref="map" :zoom="zoom" :center="center">
+          <LControlLayers ref="control"></LControlLayers>
+          <LTileLayer :url="url" :attribution="attribution"></LTileLayer>
+          <LGeoJson ref="geojson" v-if="showGeoNrw" :geojson="geonrw" :options="options"></LGeoJson>
+        </LMap>
+      </div>
+    </div>
+      
 
-    <LMap ref="map" :zoom="zoom" :center="center">
-      <LControlLayers ref="control"></LControlLayers>
-      <LTileLayer :url="url" :attribution="attribution"></LTileLayer>
-      <LGeoJson ref="geojson" v-if="showGeoNrw" :geojson="geonrw" :options="options"></LGeoJson>
-    </LMap>
-  </div>
+    
+  <!-- </div> -->
 </template>
       
 <script>
 import { LMap, LTileLayer, LGeoJson, LControlLayers } from "vue2-leaflet";
 import axios from 'axios';
-// import image from "../assets/dark-map-icon.jpg"
-// import geojsondata from "../assets/route-berlin-muenich.json"
-const API_URL = 'https://vue-map-app.herokuapp.com/motorways';
+
+const API_URL = process.env.VUE_APP_API_URL
 
 export default {
   name: "MapView",
@@ -84,7 +92,7 @@ export default {
     handleSubmit() {
       // Send data to the server
 
-      axios.get(`${API_URL}/${this.region}/`)
+      axios.get(`${API_URL}/motorways/${this.region}/`)
         .then((res) => {
           // this.getBooks();
           this.geonrw = res.data.motorways;
@@ -93,7 +101,6 @@ export default {
           // this.$refs.map.mapObject.setView(L.latLng(47.413220, -1.219482), 13);
           // this.$refs.map.mapObject.fitBounds(this.$refs.geojson.getBounds())
           this.showGeoNrw = true;
-          console.log("success")
         })
         .catch((error) => {
           // eslint-disable-next-line
