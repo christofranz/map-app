@@ -1,10 +1,11 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
+# in order to run the backend server also individually
 try:
-    from backend.server.helpers import query_overpass_api, convert_to_geo_dict, convert_relations_to_geodict
+    from backend.server.helpers import query_overpass_api, convert_relations_to_geodict
 except ImportError:
-    from helpers import query_overpass_api, convert_to_geo_dict, convert_relations_to_geodict
+    from helpers import query_overpass_api, convert_relations_to_geodict
 import os
 from geopy.geocoders import Nominatim
 
@@ -16,50 +17,22 @@ app = Flask(__name__, static_folder='../../frontend/dist/',    static_url_path='
 # Set up the index route
 @app.route('/')
 def index():
+    """Connect index from vue app."""
     return app.send_static_file('index.html')
-
-# configuration
-# DEBUG = True
-
-# instantiate the app
-# app = Flask(__name__)
-# app.config.from_object(__name__)
 
 # enable CORS
 CORS(app, resources={r'/*': {'origins': '*'}})
 
-# make overpass api query
-# overpass_query = """
-# [out:json];
-# area[name="Stuttgart"];
-# way["highway"="motorway"](area);
-# out geom;
-# """
-# motorways = convert_to_geo_dict(query_overpass_api(overpass_query))
-
-# @app.route('/motorways', methods=['GET'])
-# def get_motorways_stuttgart():
-#     return jsonify({
-#         'status': 'success',
-#         'motorways': motorways
-#     })
-
-@app.route('/motorways/<string:region>/', methods=['GET'])
-def get_motorways(region):
-    overpass_query = """
-        [out:json];
-        area[name="{}"];
-        way["highway"="motorway"](area);
-        out geom;
-    """.format(region)
-    motorways = convert_to_geo_dict(query_overpass_api(overpass_query))
-    return jsonify({
-        'status': 'success',
-        'motorways': motorways
-    })
-
 @app.route('/hiking/<string:region>/', methods=['GET'])
 def get_hiking_routes(region):
+    """Get hiking routes for the requested region.
+
+    Args:
+        region (str): Region for which to find the hiking routes.
+
+    Returns:
+        json: Response containing the status, routes and bounds.
+    """
     # Geocoding request via Nominatim
     geolocator = Nominatim(user_agent="city_compare")
     geo_results = geolocator.geocode(region, exactly_one=False, limit=3)

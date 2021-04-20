@@ -4,29 +4,20 @@ from osm2geojson import json2geojson
 
 
 def query_overpass_api(query):
-    """TODO"""
+    """Query overpass api.
+
+    Args:
+        query (str): Query to be send to overpass api.
+
+    Returns:
+        dict: Response of the query.
+    """
     overpass_url = "http://overpass-api.de/api/interpreter"
     response = requests.get(overpass_url, 
                         params={'data': query})
     data = response.json()
     return data
 
-
-def convert_to_geo_dict(data):
-    """TODO"""
-    return { "type": "FeatureCollection",
-                        "features": [ 
-                                        {"type": "Feature",
-                                         "geometry": { "type": "LineString",
-                                                       "coordinates": [ [point['lon'],
-                                                                        point['lat']] for point in feature["geometry"]]},
-                                         "properties": { key: value 
-                                                         for key, value in feature.items()
-                                                         if key != "geometry" }
-                                         } 
-                                     for feature in data["elements"]
-                                    ]
-                       }
 
 GRAYS = [
 "#000000",
@@ -68,12 +59,30 @@ GRAYS = [
 "#F5F5F5",
 "#F8F8F8"]
 
+
 def get_radom_gray():
+    """Generate a semi-random gray color.
+
+    Args:
+
+    Returns:
+        str: Gray color as hex string.
+    """
     return GRAYS[random.randint(0, len(GRAYS)-1)]
 
+
 def convert_relations_to_geodict(data):
-    """TODO"""
+    """Convert OSM relations to geojson dict.
+
+    Args:
+        data (json): Overpass api response containig relations.
+
+    Returns:
+        dict: Relations as geojson objects within a dict.
+        array: Lateral and longitudinal bounds of all relations.
+    """
     geodict = json2geojson(data)
+    # determine the geometrical bounds of the relations used in the frontend
     lat_min, lat_max, lon_min, lon_max = 10000, -10000, 10000, -10000
     for feature in geodict["features"]:
         relation_color = get_radom_gray()
