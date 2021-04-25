@@ -52,16 +52,6 @@ export default {
       geonrw: "",
       showGeo: false,
       region: "",
-      // selected: null,
-      // options_select: [
-      //   { value: null, text: 'Please select some item' },
-      //   { value: 'a', text: 'This is option a' },
-      //   { value: 'b', text: 'Default Selected Option b' },
-      //   { value: 'c', text: 'This is option c' },
-      //   { value: 'd', text: 'This one is disabled', disabled: true },
-      //   { value: 'e', text: 'This is option e' },
-      //   { value: 'e', text: 'This is option f' }
-      // ],
       geohikes: "",
       options: {
         style: function(feature) {
@@ -75,7 +65,10 @@ export default {
           if (!content) {
             content = "unknown";
           }
-          layer.bindPopup(content); // + '<br>' + feature.properties.tags.description
+          var description = feature.properties.tags.description;
+          var start_end = "From " + feature.properties.tags.from + " to " + feature.properties.tags.to;
+          // var website = "Website: " + '<a href=' + feature.properties.tags.website + '>Link</a>';
+          layer.bindPopup(content + '<br>' + start_end + '</br>' + description); // + '<br>' + website
           // alternative hovering
           layer.on('mouseover', function (e) {
             this.openPopup();
@@ -94,28 +87,12 @@ export default {
     };
   },
   methods: {
-    onEachFeature: function onEachFeature(feature, layer) {
-          layer.bindPopup(feature.properties.tags.name + '<br>' + feature.properties.tags.description);
-          // alternative hovering
-          layer.on('mouseover', function (e) {
-            this.openPopup();
-            
-            e.target.setStyle({
-            fillColor: '#ff0033',
-            });
-          });
-          layer.on('mouseout', function (e) {
-              this.closePopup();
-              e.target.resetStyle();
-          });
-          
-        },
     handleSubmit() {
       // Send data to the server
       axios.get(`${API_URL}hiking/${this.region}/`)
         .then((res) => {
-          // this.getBooks();
           this.geohikes = res.data.routes;
+          // move map tile to route bounds
           this.$refs.map.mapObject.flyToBounds(res.data.bounds, { padding: [20, 20] });
           this.showGeo = true;
         })
