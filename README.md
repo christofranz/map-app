@@ -16,7 +16,7 @@ This app is created in order to illustrate how to create an user interface with 
   
 The app allows to search for hiking routes in a dedicated region (e.g. Stuttgart) which are visualized on a geographic map subsequently. The region is entered into the Vue app and via a request to the backend server the hiking routes are obtained. The server itself makes a request to the overpass-api (accessing the Open Street Map data) and transforms the received answer into information that can be visualized by leaflet. As of now, all kind of hikes are visualized including local, national and international hikes. Once the hikes are received by the frontend, the map view is adapted to show the relevant area. If you hover over a hike the color changes and if available more information about it (like the name, description etc.) are shown.
 
-![MapApp](documentation/images/vue-map-app.png)
+![MapApp](documentation/images/vue-map-app-highlighted.png)
 
 ## Installation and Instructions<a name="installation"></a>
 The map app consists of a backend and a corresponding frontend. The backend server is created with Flask and the frontend app with the javascript framework Vue. All dependencies for the backend can be installed with python3 and the requirements.txt into a virtual environment via
