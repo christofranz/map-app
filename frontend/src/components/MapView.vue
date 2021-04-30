@@ -1,9 +1,10 @@
 <template>
   <!-- <div style="height: 80vh"> -->
     <div class="container">
-      <div class="row justify-content-center mb-3">
+      <div class="row justify-content-center mb-3 text-center">
         <!-- <b-form-select v-model="selected" :options="options_select" :select-size="4"></b-form-select>
         <div class="mt-3">Selected: <strong>{{ selected }}</strong></div> -->
+        
         <form @submit.prevent="handleSubmit">
           <div class="form-group">
             <label for="exampleRegion">Find your hikes!</label>
@@ -12,6 +13,7 @@
           </div>
           <b-button type="submit" class="btn btn-success btn-sm">Submit</b-button>
         </form>
+
       </div>
       <div style="height: 60vh">
         <LMap ref="map" :zoom="zoom" :center="center">
@@ -19,6 +21,29 @@
           <LTileLayer :url="url" :attribution="attribution"></LTileLayer>
           <LGeoJson ref="geojson" v-if="showGeo" :geojson="geohikes" :options="options"></LGeoJson>
         </LMap>
+      </div>
+      <div>
+        <md-table md-card md-alignment="left" v-if="showGeo">
+          <md-table-toolbar>
+            <h1 class="md-title">Hikes</h1>
+          </md-table-toolbar>
+          <md-table-row>
+            <md-table-head md-numeric>ID</md-table-head>
+            <md-table-head>Name</md-table-head>
+            <md-table-head>Description</md-table-head>
+            <md-table-head>Start</md-table-head>
+            <md-table-head>End</md-table-head>
+            <md-table-head>Website</md-table-head>
+          </md-table-row>
+          <md-table-row v-for="index in hiking_ids" :key="index">
+            <md-table-cell md-numeric>{{ index }} </md-table-cell>
+            <md-table-cell>{{ hiking_names[index] }}</md-table-cell>
+            <md-table-cell>{{ hiking_descriptions[index] }}</md-table-cell>
+            <md-table-cell>{{ hiking_starts[index] }}</md-table-cell>
+            <md-table-cell>{{ hiking_ends[index] }}</md-table-cell>
+            <md-table-cell><a :href="`${hiking_urls[index]}`" v-if="hiking_urls[index]">Link</a></md-table-cell>
+        </md-table-row>
+        </md-table>
       </div>
     </div>
       
@@ -53,6 +78,12 @@ export default {
       showGeo: false,
       region: "",
       geohikes: "",
+      hiking_ids: [],
+      hiking_names: [],
+      hiking_descriptions: [],
+      hiking_starts: [],
+      hiking_ends: [],
+      hiking_urls: [],
       options: {
         style: function(feature) {
             return {
@@ -88,6 +119,12 @@ export default {
   },
   methods: {
     handleSubmit() {
+      this.hiking_ids = [];
+      this.hiking_names = [];
+      this.hiking_descriptions = [];
+      this.hiking_starts = [];
+      this.hiking_ends = [];
+      this.hiking_urls = [];
       // Send data to the server
       axios.get(`${API_URL}hiking/${this.region}/`)
         .then((res) => {
@@ -95,11 +132,30 @@ export default {
           // move map tile to route bounds
           this.$refs.map.mapObject.flyToBounds(res.data.bounds, { padding: [20, 20] });
           this.showGeo = true;
+          this.fillHikeTable();
         })
         .catch((error) => {
           // eslint-disable-next-line
           console.log(error);
         });
+    },
+    fillHikeTable() {
+      this.geohikes.features.forEach((feature, index) => {
+        this.hiking_ids.push(index);
+        var name = feature.properties.tags.name
+        if (!name) {
+          name = "unknown";
+        }
+        this.hiking_names.push(name);
+        var description = feature.properties.tags.description;
+        if (!description) {
+          description = "unknown";
+        }
+        this.hiking_descriptions.push(description);
+        this.hiking_starts.push(feature.properties.tags.from);
+        this.hiking_ends.push(feature.properties.tags.to);
+        this.hiking_urls.push(feature.properties.tags.website);
+      });
     }
   },
   mounted() {
