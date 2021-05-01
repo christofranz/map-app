@@ -5,7 +5,7 @@
           <div class="form-group">
             <label for="exampleRegion">Find your hikes!</label>
             <input type="Region" v-model="region" class="form-control" id="regionInput" aria-describedby="regionHelp" placeholder="Enter a region e.g. Stuttgart">
-            <small id="emailHelp" class="form-text text-muted">Using OpenStreetMap to find all hiking routes in the specified region.</small>
+            <small id="infoSubmit" class="form-text text-muted">Using OpenStreetMap to find all hiking routes in the specified region.</small>
           </div>
           <b-button type="submit" class="btn btn-success btn-sm">Submit</b-button>
         </form>

@@ -45,7 +45,6 @@ def get_hiking_routes(region):
         raise RegionNotFound(region)
 
     # Searching for relation in result set
-    print(geo_results)
     nominatim_region = None
     for r in geo_results:
         if r.raw.get("osm_type") == "relation":
