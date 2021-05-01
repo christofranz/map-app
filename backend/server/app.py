@@ -55,12 +55,12 @@ def get_hiking_routes(region):
     # Calculating area id
     if not nominatim_region:
         raise RegionNotFound(region)
-    
+
     area_id = int(nominatim_region.raw.get("osm_id")) + 3600000000
     overpass_query = """
     [out:json];
     area({})->.searchArea;
-    relation(area.searchArea)[route=hiking];
+    relation(area.searchArea)[route=hiking][network!="lwn"];
     out geom;
     """.format(area_id)
     query_result = query_overpass_api(overpass_query)
