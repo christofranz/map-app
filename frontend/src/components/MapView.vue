@@ -1,10 +1,6 @@
 <template>
-  <!-- <div style="height: 80vh"> -->
     <div class="container">
-      <div class="row justify-content-center mb-3 text-center">
-        <!-- <b-form-select v-model="selected" :options="options_select" :select-size="4"></b-form-select>
-        <div class="mt-3">Selected: <strong>{{ selected }}</strong></div> -->
-        
+      <div class="row justify-content-center mb-3 text-center"> 
         <form @submit.prevent="handleSubmit">
           <div class="form-group">
             <label for="exampleRegion">Find your hikes!</label>
@@ -13,8 +9,8 @@
           </div>
           <b-button type="submit" class="btn btn-success btn-sm">Submit</b-button>
         </form>
-
       </div>
+      <alert :message=errorMessage v-if="showErrorMessage"></alert>
       <div style="height: 60vh">
         <LMap ref="map" :zoom="zoom" :center="center">
           <LControlLayers ref="control"></LControlLayers>
@@ -23,7 +19,7 @@
         </LMap>
       </div>
       <div>
-        <md-table md-card md-alignment="left" v-if="showGeo">
+        <md-table md-card md-alignment="left" v-if="showHikingTable">
           <md-table-toolbar>
             <h1 class="md-title">Hikes</h1>
           </md-table-toolbar>
@@ -46,15 +42,12 @@
         </md-table>
       </div>
     </div>
-      
-
-    
-  <!-- </div> -->
 </template>
       
 <script>
 import { LMap, LTileLayer, LGeoJson, LControlLayers } from "vue2-leaflet";
 import axios from 'axios';
+import Alert from './Alert.vue';
 
 const API_URL = process.env.VUE_APP_API_URL
 
@@ -64,7 +57,8 @@ export default {
     LMap,
     LTileLayer,
     LGeoJson,
-    LControlLayers
+    LControlLayers,
+    alert: Alert,
   },
   data() {
     return {
@@ -84,6 +78,9 @@ export default {
       hiking_starts: [],
       hiking_ends: [],
       hiking_urls: [],
+      showHikingTable: false,
+      showErrorMessage: false,
+      errorMessage: "",
       options: {
         style: function(feature) {
             return {
@@ -118,28 +115,38 @@ export default {
     };
   },
   methods: {
-    handleSubmit() {
+    initSubmit() {
       this.hiking_ids = [];
       this.hiking_names = [];
       this.hiking_descriptions = [];
       this.hiking_starts = [];
       this.hiking_ends = [];
       this.hiking_urls = [];
-      // Send data to the server
+      this.showHikingTable = false;
+      this.showErrorMessage = false;
+      this.errorMessage = "";
+    },
+    handleSubmit() {
+      // set all data to init values
+      this.initSubmit();
+      // make request for region
       axios.get(`${API_URL}hiking/${this.region}/`)
         .then((res) => {
           this.geohikes = res.data.routes;
           // move map tile to route bounds
           this.$refs.map.mapObject.flyToBounds(res.data.bounds, { padding: [20, 20] });
-          this.showGeo = true;
+          // fill table of hikes
           this.fillHikeTable();
         })
         .catch((error) => {
           // eslint-disable-next-line
-          console.log(error);
+          this.showErrorMessage = true;
+          this.errorMessage = error.response.data.message;
         });
     },
     fillHikeTable() {
+      this.showGeo = true;
+      this.showHikingTable = true;
       this.geohikes.features.forEach((feature, index) => {
         this.hiking_ids.push(index);
         var name = feature.properties.tags.name

@@ -1,11 +1,14 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
+from werkzeug.exceptions import NotFound, BadRequest
 # in order to run the backend server also individually
 try:
     from backend.server.helpers import query_overpass_api, convert_relations_to_geodict
+    from backend.server.exception_handler import JSONExceptionHandler, RegionNotFound
 except ImportError:
     from helpers import query_overpass_api, convert_relations_to_geodict
+    from exception_handler import JSONExceptionHandler, RegionNotFound
 import os
 from geopy.geocoders import Nominatim
 
@@ -13,6 +16,7 @@ load_dotenv()
 
 # Set up the app and point it to Vue
 app = Flask(__name__, static_folder='../../frontend/dist/',    static_url_path='/')
+handler = JSONExceptionHandler(app)
 
 # Set up the index route
 @app.route('/')
@@ -37,14 +41,22 @@ def get_hiking_routes(region):
     geolocator = Nominatim(user_agent="city_compare")
     geo_results = geolocator.geocode(region, exactly_one=False, limit=3)
 
+    if not geo_results:
+        raise RegionNotFound(region)
+
     # Searching for relation in result set
+    print(geo_results)
+    nominatim_region = None
     for r in geo_results:
         if r.raw.get("osm_type") == "relation":
-            city = r
+            nominatim_region = r
             break
 
     # Calculating area id
-    area_id = int(city.raw.get("osm_id")) + 3600000000
+    if not nominatim_region:
+        raise RegionNotFound(region)
+    
+    area_id = int(nominatim_region.raw.get("osm_id")) + 3600000000
     overpass_query = """
     [out:json];
     area({})->.searchArea;

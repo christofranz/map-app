@@ -20,9 +20,6 @@ def query_overpass_api(query):
 
 
 GRAYS = [
-"#000000",
-"#080808",
-"#101010",
 "#181818",
 "#202020",	
 "#282828",
@@ -93,8 +90,7 @@ def convert_relations_to_geodict(data):
             coordinates = []
             for c in feature["geometry"]["coordinates"]:
                 coordinates += c
-        else:
-            raise ValueError(feature["geometry"]["type"])
+        
         
         f_lat_min = min([x[1] for x in coordinates])
         f_lat_max = max([x[1] for x in coordinates])
